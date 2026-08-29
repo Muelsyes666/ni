@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎂生日快乐</title>
-    <!-- 后续开启云端许愿，请取消下面这一行注释 -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> -->
+    <!-- 云端许愿已开启 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             min-height: 100vh;
             background: linear-gradient(135deg, #1a103d, #2c1b5e, #4b2878);
@@ -24,7 +23,6 @@
             justify-content: center;
             position: relative;
         }
-
         /* 粒子容器 */
         #particle-box {
             position: fixed;
@@ -35,13 +33,11 @@
             pointer-events: none;
             z-index: 1;
         }
-
         .container {
             z-index: 10;
             text-align: center;
             padding: 20px;
         }
-
         /* 标题渐变动画 */
         .title {
             font-size: clamp(2.5rem,8vw,4.5rem);
@@ -53,38 +49,32 @@
             margin-bottom: 20px;
             font-weight: bold;
         }
-
         @keyframes gradientMove {
             0%{background-position:0% 50%;}
             100%{background-position:300% 50%;}
         }
-
         .sub-text {
             color: #ffe8f4;
             font-size: clamp(1.1rem,3vw,1.6rem);
             margin-bottom:40px;
             opacity: 0.9;
         }
-
         /* 蛋糕闪烁 */
         .cake {
             font-size: 80px;
             animation: cakeShine 1.2s ease-in-out infinite alternate;
             margin-bottom:30px;
         }
-
         @keyframes cakeShine {
             0% {transform: scale(1); filter: drop-shadow(0 0 8px #ffd700);}
             100% {transform: scale(1.08); filter: drop-shadow(0 0 22px #ffb800);}
         }
-
         .tip {
             color:#ffd8ec;
             font-size:0.95rem;
             margin-top:20px;
             opacity:0.75;
         }
-
         /* 弹出祝福文字 */
         .bless-popup {
             position: absolute;
@@ -94,19 +84,16 @@
             pointer-events:none;
             animation: popUp 1.8s ease-out forwards;
         }
-
         @keyframes popUp {
             0% {opacity:1; transform:translateY(0) scale(1);}
             100% {opacity:0; transform:translateY(-140px) scale(1.3);}
         }
-
         /* 烟花光点 */
         .firework {
             position:absolute;
             border-radius:50%;
             pointer-events:none;
         }
-
         /* 右下角信封按钮 */
         .letter-btn{
             position:fixed;
@@ -126,7 +113,6 @@
         .letter-btn:hover{
             transform:scale(1.1);
         }
-
         /*弹窗遮罩*/
         .mask{
             position:fixed;
@@ -190,7 +176,6 @@
             line-height:1.75;
             color:#222;
         }
-
         /* 许愿表单样式 */
         .wish-area{
             margin-top:26px;
@@ -221,17 +206,14 @@
 </head>
 <body>
 <div id="particle-box"></div>
-
 <div class="container">
     <div class="cake">🎂</div>
     <h1 class="title">生日快乐!</h1>
     <p class="sub-text">愿岁岁平安，万事顺意，所愿皆所得✨</p>
     <p class="tip">点击页面任意位置，解锁更多祝福与烟花🎆</p>
 </div>
-
 <!--右下角信封按钮-->
 <button class="letter-btn" id="openLetterBtn">✉️</button>
-
 <!--弹窗组件-->
 <div class="mask hidden" id="letterMask">
     <div class="modal">
@@ -268,7 +250,6 @@
  
                                                                                                                                                                                                                                                                                                                                        自嘲的我
                                                                                                                                                                                                                                                                                                                                            8.30</div>
-
             <!-- 许愿表单 -->
             <div class="wish-area">
                 <h5>🎇在这里写下你的愿望</h5>
@@ -277,26 +258,22 @@
                 <textarea id="wishInput" placeholder="写下你的愿望/想说的话……"></textarea>
                 <button class="confirm" id="submitWish">提交愿望</button>
             </div>
-
             <div class="modal-buttons" style="margin-top:22px;">
                 <button class="close" id="closeContentBtn">关闭</button>
             </div>
         </div>
     </div>
 </div>
-
 <script>
-// ============【开启云端许愿才需要填下面】============
-// const SUPABASE_URL = "你的project url";
-// const SUPABASE_ANON_KEY = "你的anon public key";
-// const { createClient } = window.supabase;
-// const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-// =====================================================
+// Supabase配置
+const SUPABASE_URL = "https://ctuphywiaxitztgptu.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0dXBoeXdpYXhpemx0emdkcHR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwMjM1NjIsImV4cCI6MjEwMzU5OTU2Mn0.qO7KhUZa9JwMQZ8xePMtdgCRzPZ6d6lAwG2cVFaxBY4";
+const { createClient } = window.supabase;
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // 飘落彩片粒子
 const particleBox = document.getElementById('particle-box');
 const colors = ['#ff88bb','#ffdd77','#72e8ff','#ff9977','#b89dff','#ffffff'];
-
 function createParticle(){
     const p = document.createElement('div');
     p.style.position = 'absolute';
@@ -307,12 +284,10 @@ function createParticle(){
     p.style.top = '-15px';
     p.style.borderRadius = Math.random()>0.5?'50%':'0';
     particleBox.appendChild(p);
-
     const speedY = Math.random()*2+1;
     const speedX = (Math.random()-0.5)*1.2;
     let y = -15;
     let x = parseFloat(p.style.left);
-
     function fall(){
         y += speedY;
         x += speedX;
@@ -326,20 +301,16 @@ function createParticle(){
     }
     fall();
 }
-
 // 持续生成粒子
 setInterval(createParticle,120);
-
 // 点击：弹出祝福语 + 烟花
 const blessWords = [
     "平安喜乐🎉","天天开心🥳","万事胜意🌟","好运爆棚💫","暴富变美✨",
     "岁岁常欢愉🎊","年年皆胜意🥂","所有梦想都开花🌸","被世界温柔以待💖"
 ];
-
 document.body.addEventListener('click',(e)=>{
     // 点击弹窗、信封按钮不触发烟花
     if(e.target.closest(".letter-btn") || e.target.closest(".mask")) return;
-
     //弹出文字
     const txt = document.createElement('div');
     txt.className = 'bless-popup';
@@ -348,7 +319,6 @@ document.body.addEventListener('click',(e)=>{
     txt.style.top = e.clientY +'px';
     document.body.appendChild(txt);
     setTimeout(()=>txt.remove(),1800);
-
     //烟花爆炸光点
     for(let i=0;i<35;i++){
         const dot = document.createElement('div');
@@ -360,21 +330,17 @@ document.body.addEventListener('click',(e)=>{
         dot.style.left = e.clientX +'px';
         dot.style.top = e.clientY +'px';
         document.body.appendChild(dot);
-
         const angle = Math.PI*2*Math.random();
         const dis = Math.random()*120+40;
         const endX = e.clientX + Math.cos(angle)*dis;
         const endY = e.clientY + Math.sin(angle)*dis;
-
         dot.animate([
             {left:e.clientX+'px', top:e.clientY+'px', opacity:1},
             {left:endX+'px', top:endY+'px', opacity:0}
         ],{duration:700, easing:'ease-out'});
-
         setTimeout(()=>dot.remove(),700);
     }
 })
-
 //信封弹窗逻辑
 const openLetterBtn = document.getElementById('openLetterBtn');
 const letterMask = document.getElementById('letterMask');
@@ -385,7 +351,6 @@ const checkAnswerBtn = document.getElementById('checkAnswerBtn');
 const closeModalBtn = document.getElementById('closeModalBtn');
 const closeContentBtn = document.getElementById('closeContentBtn');
 const RIGHT_ANSWER = "mj";
-
 //许愿dom
 const nickInput = document.getElementById("nickInput");
 const wishInput = document.getElementById("wishInput");
@@ -397,13 +362,11 @@ openLetterBtn.onclick = function(){
     contentBlock.classList.add('hidden');
     answerInput.value = '';
 }
-
 function closeModal(){
     letterMask.classList.add('hidden');
 }
 closeModalBtn.onclick = closeModal;
 closeContentBtn.onclick = closeModal;
-
 checkAnswerBtn.onclick = function(){
     let userAns = answerInput.value.trim().toLowerCase();
     if(userAns === RIGHT_ANSWER){
@@ -414,35 +377,22 @@ checkAnswerBtn.onclick = function(){
     }
 }
 
-//【现在仅本地提示，没有上传云端，开启云端要打开上面supabase注释】
+// 真实云端提交愿望
 submitWishBtn.onclick = async function(){
     const nick = nickInput.value.trim() || "匿名";
     const wishText = wishInput.value.trim();
-    if(!wishText){
-        alert("请写下你的愿望！");
-        return;
-    }
-
-    // =========如果开启云端，这里替换成supabase插入代码========
-    alert("愿望已记录（当前未接入云端，仅界面演示）\n"+"昵称："+nick+"\n愿望："+wishText);
-    nickInput.value = "";
-    wishInput.value = "";
-
-    /*
+    if(!wishText){ alert("请写下你的愿望！"); return; }
     submitWishBtn.disabled = true;
     submitWishBtn.innerText = "提交中...";
-    const {error} = await supabase.from("wishes").insert([{nickname:nick,content:wishText}]);
-    if(error){
-        alert("提交失败："+error.message);
-    }else{
-        alert("愿望已成功提交✨");
-        nickInput.value = "";
-        wishInput.value = "";
-    }
+    const { error } = await supabase.from("wishes").insert([
+        { content: "【" + nick + "】" + wishText }
+    ]);
+    if(error){ alert("提交失败：" + error.message); }
+    else{ alert("愿望已成功提交✨"); nickInput.value=""; wishInput.value=""; }
     submitWishBtn.disabled = false;
     submitWishBtn.innerText = "提交愿望";
-    */
 }
 </script>
 </body>
 </html>
+
