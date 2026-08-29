@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎂生日快乐</title>
+    <!-- 后续开启云端许愿，请取消下面这一行注释 -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a103d, #2c1b5e, #4b2878);
+            overflow-x: hidden;
+            font-family: "Microsoft Yahei", sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* 粒子容器 */
+        #particle-box {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* 标题渐变动画 */
+        .title {
+            font-size: clamp(2.5rem,8vw,4.5rem);
+            background: linear-gradient(90deg,#ff7eb3,#ffdd94,#74fdff,#ff7eb3);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: gradientMove 4s linear infinite;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        @keyframes gradientMove {
+            0%{background-position:0% 50%;}
+            100%{background-position:300% 50%;}
+        }
+
+        .sub-text {
+            color: #ffe8f4;
+            font-size: clamp(1.1rem,3vw,1.6rem);
+            margin-bottom:40px;
+            opacity: 0.9;
+        }
+
+        /* 蛋糕闪烁 */
+        .cake {
+            font-size: 80px;
+            animation: cakeShine 1.2s ease-in-out infinite alternate;
+            margin-bottom:30px;
+        }
+
+        @keyframes cakeShine {
+            0% {transform: scale(1); filter: drop-shadow(0 0 8px #ffd700);}
+            100% {transform: scale(1.08); filter: drop-shadow(0 0 22px #ffb800);}
+        }
+
+        .tip {
+            color:#ffd8ec;
+            font-size:0.95rem;
+            margin-top:20px;
+            opacity:0.75;
+        }
+
+        /* 弹出祝福文字 */
+        .bless-popup {
+            position: absolute;
+            color:#fff8bc;
+            font-weight:bold;
+            font-size:1.3rem;
+            pointer-events:none;
+            animation: popUp 1.8s ease-out forwards;
+        }
+
+        @keyframes popUp {
+            0% {opacity:1; transform:translateY(0) scale(1);}
+            100% {opacity:0; transform:translateY(-140px) scale(1.3);}
+        }
+
+        /* 烟花光点 */
+        .firework {
+            position:absolute;
+            border-radius:50%;
+            pointer-events:none;
+        }
+
+        /* 右下角信封按钮 */
+        .letter-btn{
+            position:fixed;
+            bottom:30px;
+            right:30px;
+            z-index:999;
+            width:60px;
+            height:60px;
+            border-radius:50%;
+            background:#ffb726;
+            border:none;
+            font-size:28px;
+            cursor:pointer;
+            box-shadow:0 0 14px rgba(255,183,38,0.5);
+            transition: transform 0.2s;
+        }
+        .letter-btn:hover{
+            transform:scale(1.1);
+        }
+
+        /*弹窗遮罩*/
+        .mask{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.7);
+            z-index:2000;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+        }
+        .mask.hidden{
+            display:none;
+        }
+        .hidden{
+            display: none !important;
+        }
+        .modal{
+            background:#fff8e8;
+            color:#222;
+            padding:28px;
+            border-radius:16px;
+            width:100%;
+            max-width:540px;
+            max-height:85vh;
+            overflow-y:auto;
+        }
+        .modal h4{
+            margin-bottom:14px;
+            font-size:18px;
+        }
+        .modal input{
+            width:100%;
+            padding:10px;
+            border:1px solid #ccc;
+            border-radius:8px;
+            margin-bottom:14px;
+        }
+        .modal-buttons{
+            display:flex;
+            gap:10px;
+        }
+        .modal button{
+            flex:1;
+            padding:9px;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+        }
+        .confirm{
+            background:#ffb726;
+            font-weight:bold;
+        }
+        .close{
+            background:#cccccc;
+        }
+        /*信件：保留原始换行，顶格，不自动缩进 */
+        .letter-text{
+            white-space:pre-wrap;
+            font-size:14px;
+            line-height:1.75;
+            color:#222;
+        }
+
+        /* 许愿表单样式 */
+        .wish-area{
+            margin-top:26px;
+            padding-top:20px;
+            border-top:1px solid #ddcdac;
+        }
+        .wish-area h5{
+            font-size:15px;
+            margin-bottom:12px;
+        }
+        .wish-tip{
+            font-size:12px;
+            color:#666;
+            margin-bottom:10px;
+        }
+        .wish-area input,.wish-area textarea{
+            width:100%;
+            padding:10px;
+            border:1px solid #ccc;
+            border-radius:8px;
+            margin-bottom:12px;
+        }
+        .wish-area textarea{
+            min-height:70px;
+            resize:none;
+        }
+    </style>
+</head>
+<body>
+<div id="particle-box"></div>
+
+<div class="container">
+    <div class="cake">🎂</div>
+    <h1 class="title">生日快乐!</h1>
+    <p class="sub-text">愿岁岁平安，万事顺意，所愿皆所得✨</p>
+    <p class="tip">点击页面任意位置，解锁更多祝福与烟花🎆</p>
+</div>
+
+<!--右下角信封按钮-->
+<button class="letter-btn" id="openLetterBtn">✉️</button>
+
+<!--弹窗组件-->
+<div class="mask hidden" id="letterMask">
+    <div class="modal">
+        <div id="questionBlock">
+            <h4>🔐请回答问题查看信件</h4>
+            <p>问题：你的名字？</p>
+            <input id="answerInput" placeholder="输入答案">
+            <div class="modal-buttons">
+                <button class="confirm" id="checkAnswerBtn">确认</button>
+                <button class="close" id="closeModalBtn">关闭</button>
+            </div>
+        </div>
+        <div id="contentBlock" class="hidden">
+            <div class="letter-text">寄给陌生的你：
+生日快乐！
+如果你能点进来这个网页，我是挺开心的，希望我没记错你的生日。
+以下可以可以当作我对你说的话，或当做我的自述，或当做你没阅读过，以下的话会极大概率让你不开心
+现在想想我自己真的很搞笑，什么话都不敢说，想表达的意思都是云里雾里，我胆子真是小到不敢靠近你半点，想必你也为此讨厌我很久了吧。真的很对不起
+时间已经过去了三年，我觉得再不说几句话，我就觉得真对不起你了，我对你想法经过了许许多多的变化，我觉得我对你的心理时而强烈时而淡，开心时会短暂忘记你，有点难过时总会想起你，有时去到一个人多的地方，余光瞥见一点类似你的身影，我总会不由自主的望过去，却又十分胆怯的怕注意到我。过去了这么久，我能想到和你说什么话都没有几句，甚至梦里，我都开不了口，就像还在那间教室一样，默默的看着你离开。毫无疑问，我就是喜欢你。也越想越对不起你，如果你因此是如此的到现在还讨厌着我，我也认了，我自己都想嘲笑我自己。或许我们和不来……
+唉，都是你生日了我都还在说这么沉重的话，如果让你感到不舒服，不开心，你可以把我当做一个乐子，一个小丑吧，不是人类了。
+我对你的了解可以说是少之又少了，只知道你会玩滑板，好像喜欢吃巧克力？生日大概是今天？会和朋友出去打羽毛球？唉，快手应该是有个号吧，之前某些时候偶尔点了赞又取消了，不知道你有没有注意到，想来也不会注意到，我都是老晚的时候点的，嘲笑自己的点又多一个，后来搜不到了就没看了。你还玩上抖音直播了，我也是前些时候和朋友小聚的时候才知道的。偶尔有机会瞥一眼朋友的朋友圈，能看到的只有划到你的几张模糊图片和模糊的文字，看的时候还小心翼翼的生怕朋友知道，估计谁都不会发现吧哈哈，有点机会我就会自然把话题往你身上推，虽然没一点收获。这三年也不知道你播了几次，感觉你挺厉害也挺适合的，也不知道你抖音叫啥名，还打上pk了，如果可以为表歉意我要是知道我肯定送你点礼物助力一下。哎化学不是你们说的天坑吗你咋还去化学专业呢，想必没啥就业前景才玩的pk试试看的吧，pk你应该也挺厉害的吧，总觉得会适合你。不过你这么优秀，应该会考虑研究生及往上，由衷的祝福你能更上一层楼，不然当老师的话有点惜才了吧。之前的台风天气希望没有影响到你的家吧，想去当志愿者的唉，就我这体格我妈没让我去。我并没有想刻意的告诉你什么，你可以当做一个自述吧，自我惋惜罢了，我估摸着你会点进来的概率也不大。
+我不知道我该给我和你当前是怎么样的状态？唉，估计什么都不是，最多算是个有好感的陌生人吧
+。或许是我的一厢情愿。我能了解你的途径目前就只有点你的头像，点开你的朋友圈，陌生人的权限只有看着你那朋友圈的背景图，想想我大抵是个无趣的人吧，我觉得我都没啥有趣朋友圈能发出来的。真希望能让你开心一点啊……我觉得我做不到。能让你开心的人应该有很多吧，我觉得我不是其中之一。这三年我有无数次想点击添加好友，就是没有点，怕误会，怕打扰，怕无聊，时间越往后越怕得浓烈。三年还是没有改变，我真无可救药
+发自内心的感觉你会非常非常的讨厌我
+我是一个失败的，对你来说估计人都算不上来吧
+我的前半生都很失败……
+不知道在你的印象里我除了厌恶还有什么.....
+说完了这些话，我也算是应该和你没有什么机会了吧。真的非常抱歉，点进来看到的却是我的私心，是我泼的苦水，抱歉抱歉抱歉。如果你还对我抱有希望，我不知道我会不会做出什么大改变，会有怎样的变化，大概你只能得到一点点你不会感到满意回应。
+你也不必感觉到对我有一点点可怜，做这个网站是ai跑出来的，写这些字时也没有花多长时间。
+你是一个优秀的人，你很厉害，很勇敢，很坚强，很优秀。不是我主观臆断，是我从客观上来的判断。我觉得你的脚步不需要在我这里停留，你值得拥有更美好，更充满希望的未来。唉越想越觉得拖累你。如果你放弃了我，我估计也一直是这个状态吧，不必为此有啥负担，我会大概会一直这样，慢慢的把你忘记吧
+生日嘛，总得开心点吧。作为老是伤害你的我总想补偿你点什么，你可以恶狠狠的在下面许个愿望，对我嘲笑对我谩骂诅咒我什么的，或者恶狠狠的想要个什么贵重的礼物让我破费，毕竟是一点补偿（力所能及的，如果我做不到我会找个相仿的或者价格差不多的）。你对自己的愿望就许好的吧。在我这，对我不用客气，怎么样都行，我尽力给你满足。
+最大的惩罚应该就是没有任何反应吧
+祝精彩！
+ 
+                                                                                                                                                                                                                                                                                                                                       自嘲的我
+                                                                                                                                                                                                                                                                                                                                           8.30</div>
+
+            <!-- 许愿表单 -->
+            <div class="wish-area">
+                <h5>🎇在这里写下你的愿望</h5>
+                <div class="wish-tip">提示：如果想要礼物补偿，请填写收货地址，如有冒犯我绝不会记住</div>
+                <input id="nickInput" placeholder="你的昵称（选填）">
+                <textarea id="wishInput" placeholder="写下你的愿望/想说的话……"></textarea>
+                <button class="confirm" id="submitWish">提交愿望</button>
+            </div>
+
+            <div class="modal-buttons" style="margin-top:22px;">
+                <button class="close" id="closeContentBtn">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============【开启云端许愿才需要填下面】============
+// const SUPABASE_URL = "你的project url";
+// const SUPABASE_ANON_KEY = "你的anon public key";
+// const { createClient } = window.supabase;
+// const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// =====================================================
+
+// 飘落彩片粒子
+const particleBox = document.getElementById('particle-box');
+const colors = ['#ff88bb','#ffdd77','#72e8ff','#ff9977','#b89dff','#ffffff'];
+
+function createParticle(){
+    const p = document.createElement('div');
+    p.style.position = 'absolute';
+    p.style.width = Math.random()*10+4 +'px';
+    p.style.height = Math.random()*10+4 +'px';
+    p.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+    p.style.left = Math.random()*100 +'%';
+    p.style.top = '-15px';
+    p.style.borderRadius = Math.random()>0.5?'50%':'0';
+    particleBox.appendChild(p);
+
+    const speedY = Math.random()*2+1;
+    const speedX = (Math.random()-0.5)*1.2;
+    let y = -15;
+    let x = parseFloat(p.style.left);
+
+    function fall(){
+        y += speedY;
+        x += speedX;
+        p.style.top = y+'px';
+        p.style.left = x+'%';
+        if(y>window.innerHeight){
+            p.remove();
+        }else{
+            requestAnimationFrame(fall);
+        }
+    }
+    fall();
+}
+
+// 持续生成粒子
+setInterval(createParticle,120);
+
+// 点击：弹出祝福语 + 烟花
+const blessWords = [
+    "平安喜乐🎉","天天开心🥳","万事胜意🌟","好运爆棚💫","暴富变美✨",
+    "岁岁常欢愉🎊","年年皆胜意🥂","所有梦想都开花🌸","被世界温柔以待💖"
+];
+
+document.body.addEventListener('click',(e)=>{
+    // 点击弹窗、信封按钮不触发烟花
+    if(e.target.closest(".letter-btn") || e.target.closest(".mask")) return;
+
+    //弹出文字
+    const txt = document.createElement('div');
+    txt.className = 'bless-popup';
+    txt.innerText = blessWords[Math.floor(Math.random()*blessWords.length)];
+    txt.style.left = e.clientX +'px';
+    txt.style.top = e.clientY +'px';
+    document.body.appendChild(txt);
+    setTimeout(()=>txt.remove(),1800);
+
+    //烟花爆炸光点
+    for(let i=0;i<35;i++){
+        const dot = document.createElement('div');
+        dot.className = 'firework';
+        const size = Math.random()*7+2;
+        dot.style.width = size+'px';
+        dot.style.height = size+'px';
+        dot.style.background = colors[Math.floor(Math.random()*colors.length)];
+        dot.style.left = e.clientX +'px';
+        dot.style.top = e.clientY +'px';
+        document.body.appendChild(dot);
+
+        const angle = Math.PI*2*Math.random();
+        const dis = Math.random()*120+40;
+        const endX = e.clientX + Math.cos(angle)*dis;
+        const endY = e.clientY + Math.sin(angle)*dis;
+
+        dot.animate([
+            {left:e.clientX+'px', top:e.clientY+'px', opacity:1},
+            {left:endX+'px', top:endY+'px', opacity:0}
+        ],{duration:700, easing:'ease-out'});
+
+        setTimeout(()=>dot.remove(),700);
+    }
+})
+
+//信封弹窗逻辑
+const openLetterBtn = document.getElementById('openLetterBtn');
+const letterMask = document.getElementById('letterMask');
+const questionBlock = document.getElementById('questionBlock');
+const contentBlock = document.getElementById('contentBlock');
+const answerInput = document.getElementById('answerInput');
+const checkAnswerBtn = document.getElementById('checkAnswerBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const closeContentBtn = document.getElementById('closeContentBtn');
+const RIGHT_ANSWER = "mj";
+
+//许愿dom
+const nickInput = document.getElementById("nickInput");
+const wishInput = document.getElementById("wishInput");
+const submitWishBtn = document.getElementById("submitWish");
+
+openLetterBtn.onclick = function(){
+    letterMask.classList.remove('hidden');
+    questionBlock.classList.remove('hidden');
+    contentBlock.classList.add('hidden');
+    answerInput.value = '';
+}
+
+function closeModal(){
+    letterMask.classList.add('hidden');
+}
+closeModalBtn.onclick = closeModal;
+closeContentBtn.onclick = closeModal;
+
+checkAnswerBtn.onclick = function(){
+    let userAns = answerInput.value.trim().toLowerCase();
+    if(userAns === RIGHT_ANSWER){
+        questionBlock.classList.add('hidden');
+        contentBlock.classList.remove('hidden');
+    }else{
+        alert("答案错误，无法打开信件");
+    }
+}
+
+//【现在仅本地提示，没有上传云端，开启云端要打开上面supabase注释】
+submitWishBtn.onclick = async function(){
+    const nick = nickInput.value.trim() || "匿名";
+    const wishText = wishInput.value.trim();
+    if(!wishText){
+        alert("请写下你的愿望！");
+        return;
+    }
+
+    // =========如果开启云端，这里替换成supabase插入代码========
+    alert("愿望已记录（当前未接入云端，仅界面演示）\n"+"昵称："+nick+"\n愿望："+wishText);
+    nickInput.value = "";
+    wishInput.value = "";
+
+    /*
+    submitWishBtn.disabled = true;
+    submitWishBtn.innerText = "提交中...";
+    const {error} = await supabase.from("wishes").insert([{nickname:nick,content:wishText}]);
+    if(error){
+        alert("提交失败："+error.message);
+    }else{
+        alert("愿望已成功提交✨");
+        nickInput.value = "";
+        wishInput.value = "";
+    }
+    submitWishBtn.disabled = false;
+    submitWishBtn.innerText = "提交愿望";
+    */
+}
+</script>
+</body>
+</html>
